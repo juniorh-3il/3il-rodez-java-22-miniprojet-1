@@ -3,13 +3,14 @@ package fr.ecole3il.rodez2023.perlin.math;
 /**
  * La classe abstraite Noise2D est une base pour la génération de bruit en 2D.
  * Elle définit des méthodes permettant d'obtenir des valeurs de bruit en deux dimensions.
+ * @author Hugo JUNIOR
  */
 public abstract class Bruit2D {
     
-    /** La graine utilisée pour la génération du bruit */
+    // La graine utilisée pour la génération du bruit
     private final long graine;
 
-    /** La résolution utilisée pour paramétrer la granularité de l'image générée */
+    // La résolution utilisée pour paramétrer la granularité de l'image générée
     private double resolution;
     
     /**

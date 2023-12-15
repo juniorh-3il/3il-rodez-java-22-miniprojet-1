@@ -4,7 +4,8 @@ import java.util.Random;
 
 /**
  * La classe RandomNoise étend la classe Noise2D et génère du bruit aléatoire en deux dimensions.
- * Elle utilise la classe Random de Java pour générer des valeurs aléatoires.
+ * Elle utilise la classe Random de Java pour générer des valeurs pseudo-aléatoires.
+ * @author Hugo JUNIOR
  */
 public class BruitAleatoire extends Bruit2D {
 
@@ -18,7 +19,8 @@ public class BruitAleatoire extends Bruit2D {
     }
 
     /**
-     * Génère un double aléatoire.
+     * Génère un double pseudo-aléatoire à partir de la classe java.util.Random.
+     * @see java.util.Random
      * @param x Coordonnée x pour laquelle obtenir le bruit.
      * @param y Coordonnée y pour laquelle obtenir le bruit.
      * @return un double aléatoire.
