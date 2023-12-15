@@ -2,15 +2,19 @@ package fr.ecole3il.rodez2023.perlin.math;
 
 
 /**
- * @author philibert roquart, fainéant
+ * La classe BruitPerlin2D étends la classe Bruit2D et génère du bruit de Perlin en 2 dimensions.
+ * Elle utilise son attribut statique PERMUTATION pour générer des valeurs aléatoires.
+ * @author Hugo JUNIOR
  */
 public class BruitPerlin2D extends Bruit2D {
 
 	// Vecteurs de gradient pour le bruit de Perlin
-	private static final float[][] GRADIENT_2D = { { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 }, { 1, 0 }, { -1, 0 },
-			{ 0, 1 }, { 0, -1 } };
+	private static final float[][] GRADIENT_2D = {
+			{ 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 },
+			{ 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }
+	};
 
-	// Tableau de permutations pour le bruit de Perlin
+	// Tableau de permutations initial pour le bruit de Perlin commun à toutes les instances de BruitPerlin2D
 	private static final int[] PERMUTATION = { 151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225,
 			140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94,
 			252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74,
@@ -24,63 +28,64 @@ public class BruitPerlin2D extends Bruit2D {
 			176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195,
 			78, 66, 215, 61, 156, 180 };
 
+	// Tableau de permutations pour le bruit de Perlin
 	private final int[] permutation;
 
+	/**
+	 * Constructeur de la classe BruitPerlin2D.
+	 * @param graine La graine utilisée pour instancier la classe mère de BruitPerlin2D, Bruit2D.
+	 * @param resolution La resolution utilisée pour paramétrer la granularité de l'image générée.
+	 */
 	public BruitPerlin2D(long graine, double resolution) {
 		super(graine, resolution);
 		this.permutation = PERMUTATION;
 	}
 
+	/**
+	 * Génère un double pseudo-aléatoire à partir d'un bruit de Perlin.
+	 * @param x Coordonnée x pour laquelle obtenir le bruit.
+	 * @param y Coordonnée y pour laquelle obtenir le bruit.
+	 * @return un double pseudo-aléatoire.
+	 */
 	@Override
 	public double bruit2D(double x, double y) {
-		double tempX, tempY;
-		int x0, y0, ii, jj, gi0, gi1, gi2, gi3;
-		double unit = 1.0f / (double) Math.sqrt(2);
-		double tmp, s, t, u, v, Cx, Cy, Li1, Li2;
+		int negX, negY, posX, posY, indexGradientNegXNegY, indexGradientPosXNegY, indexGradientNegXPosY, indexGradientPosXPosY;
+		double vecteurNegXNegY, vecteurPosXNegY, vecteurNegXPosY, vecteurPosXPosY, Cx, Cy, Li1, Li2, deltaNegX, deltaPosX, deltaNegY, deltaPosY;
+
 		// Adapter pour la résolution
-		x /= resolution;
-		y /= resolution;
+		x /= this.getResolution();
+		y /= this.getResolution();
 
 		// Obtenir les coordonnées de la grille associées à (x, y)
-		x0 = (int) (x);
-		y0 = (int) (y);
+		negX = (int) (x);
+		negY = (int) (y);
+		posX = negX + 1;
+		posY = negY + 1;
 
-		// Masquage pour récupérer les indices de permutation
-		ii = x0 & 255;
-		jj = y0 & 255;
+		// TODO: Rédiger un commentaire
+		deltaNegX = x - negX;
+		deltaPosX = x - posX;
+		deltaNegY = y - negY;
+		deltaPosY = y - posY;
 
 		// Récupérer les indices de gradient associés aux coins du quadrilatère
-		gi0 = permutation[ii + permutation[jj]] % 8;
-		gi1 = permutation[ii + 1 + permutation[jj]] % 8;
-		gi2 = permutation[ii + permutation[jj + 1]] % 8;
-		gi3 = permutation[ii + 1 + permutation[jj + 1]] % 8;
+		indexGradientNegXNegY = this.permutation[negX + this.permutation[negY]] % 8;
+		indexGradientPosXNegY = this.permutation[posX + this.permutation[negY]] % 8;
+		indexGradientNegXPosY = this.permutation[negX + this.permutation[posY]] % 8;
+		indexGradientPosXPosY = this.permutation[posX + this.permutation[posY]] % 8;
 
 		// Récupérer les vecteurs de gradient et effectuer des interpolations pondérées
-		tempX = x - x0;
-		tempY = y - y0;
-		s = GRADIENT_2D[gi0][0] * tempX + GRADIENT_2D[gi0][1] * tempY;
-
-		tempX = x - (x0 + 1);
-		tempY = y - y0;
-		t = GRADIENT_2D[gi1][0] * tempX + GRADIENT_2D[gi1][1] * tempY;
-
-		tempX = x - x0;
-		tempY = y - (y0 + 1);
-		u = GRADIENT_2D[gi2][0] * tempX + GRADIENT_2D[gi2][1] * tempY;
-
-		tempX = x - (x0 + 1);
-		tempY = y - (y0 + 1);
-		v = GRADIENT_2D[gi3][0] * tempX + GRADIENT_2D[gi3][1] * tempY;
+		vecteurNegXNegY = GRADIENT_2D[indexGradientNegXNegY][0] * deltaNegX + GRADIENT_2D[indexGradientNegXNegY][1] * deltaNegY;
+		vecteurPosXNegY = GRADIENT_2D[indexGradientPosXNegY][0] * deltaPosX + GRADIENT_2D[indexGradientPosXNegY][1] * deltaNegY;
+		vecteurNegXPosY = GRADIENT_2D[indexGradientNegXPosY][0] * deltaNegX + GRADIENT_2D[indexGradientNegXPosY][1] * deltaPosY;
+		vecteurPosXPosY = GRADIENT_2D[indexGradientPosXPosY][0] * deltaPosX + GRADIENT_2D[indexGradientPosXPosY][1] * deltaPosY;
 
 		// Interpolations pour lisser les valeurs obtenues
-		tmp = x - x0;
-		Cx = 3 * tmp * tmp - 2 * tmp * tmp * tmp;
+		Cx = 3 * Math.pow(deltaNegX, 2) - 2 * Math.pow(deltaNegX, 3);
+		Cy = 3 * Math.pow(deltaNegY, 2) - 2 * Math.pow(deltaNegY, 3);
 
-		Li1 = s + Cx * (t - s);
-		Li2 = u + Cx * (v - u);
-
-		tmp = y - y0;
-		Cy = 3 * tmp * tmp - 2 * tmp * tmp * tmp;
+		Li1 = vecteurNegXNegY + Cx * (vecteurPosXNegY - vecteurNegXNegY);
+		Li2 = vecteurNegXPosY + Cx * (vecteurPosXPosY - vecteurNegXPosY);
 
 		return Li2 + Cy * (Li2 - Li1);
 	}
