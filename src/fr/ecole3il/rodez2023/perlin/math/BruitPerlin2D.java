@@ -62,7 +62,7 @@ public class BruitPerlin2D extends Bruit2D {
 		posX = negX + 1;
 		posY = negY + 1;
 
-		// TODO: Rédiger un commentaire
+		// Calcul des deltas entre le point (x, y) et les 4 sommets de sa cellule
 		deltaNegX = x - negX;
 		deltaPosX = x - posX;
 		deltaNegY = y - negY;
